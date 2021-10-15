@@ -45,27 +45,19 @@ def dataAugment(imageTensor):
 
 def convertSpace(imageTensor):
     data = []
-    newImage = torch.empty((7500,3,128,128))
-    for i  in range(7500):
+    newImage = torch.empty(imageTensor.size())
+    for i  in range(len(imageTensor)):
         data.append(cv2.cvtColor(imageTensor[i].permute(1,2,0).numpy(), cv2.COLOR_RGB2LAB))
     return getTorchTensor(numpy.array(data, dtype='f'))
 
 def getTrainTest(imageTensor):
     xtensor = torch.mul(imageTensor[:,:1,:,:], .01)
     ytensor = imageTensor[:,1:3,:,:]
-    for i in range(7500):
-        ytensor[i, 0] = torch.mean(ytensor[i, 0])
-        ytensor[i, 1] = torch.mean(ytensor[i, 1])
-    ytensor.resize_((7500,2))    
     return xtensor, ytensor
 
 class CustomImageDataset(Dataset):
-    def __init__(self):
-        images = getData()
-        ten = getTorchTensor(images)
-        img = dataAugment(ten)
-        img = convertSpace(img)
-        x,y = getTrainTest(img)
+    def __init__(self, dataTensor):
+        x,y = getTrainTest(dataTensor)
         self.img = x
         self.img_labels = y
 
@@ -73,7 +65,6 @@ class CustomImageDataset(Dataset):
         return len(self.img_labels)
 
     def __getitem__(self, idx):
-        
         return self.img[idx], self.img_labels[idx]
 
 if __name__ == '__main__':
