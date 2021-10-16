@@ -28,7 +28,7 @@ def getTorchTensor(images):
 def dataAugment(imageTensor):
     # Create a composition of transforms
     data_transforms = transforms.Compose([
-        transforms.RandomHorizontalFlip(p =.6),
+        transforms.RandomHorizontalFlip(p =.5),
         transforms.RandomApply([transforms.RandomResizedCrop(size=128)], p =.5),
         transforms.RandomApply([scaleRGB()], p =.5),
     ])

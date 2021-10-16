@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 from dataloader import *
 from torch.utils.data import DataLoader
-import random
+
 
 # Derived class for CNN
 class Net(nn.Module):
