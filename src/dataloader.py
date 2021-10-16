@@ -73,14 +73,3 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.img[idx], self.img_labels[idx]
-
-if __name__ == '__main__':
-    images = getData()
-    ten = getTorchTensor(images)
-    img = dataAugment(ten)
-    img = convertSpace(img)
-    x,y = getTrainTest(img)
-
-"""img1 = cv2.cvtColor(img[750].permute(1,2,0).numpy(), cv2.COLOR_LAB2BGR)
-    cv2.imshow('h', img1)
-    cv2.waitKey(0)"""
