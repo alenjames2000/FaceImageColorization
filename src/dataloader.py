@@ -12,11 +12,11 @@ from torchvision.io import read_image
 from torch.utils.data import Dataset
 
 
-
+# Set img directory and tensor type
 img_dir = "../face_images/*.jpg"
 torch.set_default_tensor_type('torch.FloatTensor')
 
-
+# Reads in data from the face_images folder and returns a numpy array containing the RGB channels
 def getData():
     files = glob.glob(img_dir)
     data =[]
@@ -25,16 +25,19 @@ def getData():
         data.append(img)
     return numpy.array(data, dtype='f')
 
+# Coverts numpy array to a Pytorch Tensor
 def getTorchTensor(images): 
     return torch.from_numpy(images).permute(0,3,1,2)
     
-
+# Transforms the images to augemnt the dataset by 10x
 def dataAugment(imageTensor):
+    # Create a composition of transforms
     data_transforms = transforms.Compose([
         transforms.RandomHorizontalFlip(p =.6),
         transforms.RandomApply([transforms.RandomResizedCrop(size=128)], p =.5),
         transforms.RandomApply([scaleRGB()], p =.5),
     ])
+    # Apply transfroms and return augmented tensor of images
     img = data_transforms(imageTensor)
     img = torch.cat((imageTensor, img))
     for i in range(8):
@@ -43,6 +46,7 @@ def dataAugment(imageTensor):
     
     return img
 
+# Convert from RGB to LAB space
 def convertSpace(imageTensor):
     data = []
     newImage = torch.empty((7500,3,128,128))
@@ -59,6 +63,7 @@ def getTrainTest(imageTensor):
     ytensor.resize_((7500,2))    
     return xtensor, ytensor
 
+# Derived class for Getting Image dataset
 class CustomImageDataset(Dataset):
     def __init__(self):
         images = getData()
@@ -76,13 +81,3 @@ class CustomImageDataset(Dataset):
         
         return self.img[idx], self.img_labels[idx]
 
-if __name__ == '__main__':
-    images = getData()
-    ten = getTorchTensor(images)
-    img = dataAugment(ten)
-    img = convertSpace(img)
-    x,y = getTrainTest(img)
-
-"""img1 = cv2.cvtColor(img[750].permute(1,2,0).numpy(), cv2.COLOR_LAB2BGR)
-    cv2.imshow('h', img1)
-    cv2.waitKey(0)"""

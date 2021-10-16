@@ -4,6 +4,7 @@ import torch.optim as optim
 from dataloader import *
 from torch.utils.data import DataLoader
 
+# Derived class for CNN
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -25,12 +26,15 @@ class Net(nn.Module):
         x = F.relu(self.conv7(x))
         return torch.reshape(x, (len(x), 2))
 
-
+# Create NN
 net = Net()
 
+
+# Define loss function and optimizer
 criterion = nn.MSELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
+# Set up dataloaders
 training_data = CustomImageDataset()
 trainloader = DataLoader(training_data, batch_size=64, shuffle=True)
 
@@ -51,9 +55,7 @@ for epoch in range(50):  # loop over the dataset multiple times
 
         # print statistics
         running_loss += loss.item()
-        if i % 100 == 99:    # print every 2000 mini-batches
+        if i % 100 == 99:    # print every 100 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 100))
             running_loss = 0.0
-
-print('Finished Training')
