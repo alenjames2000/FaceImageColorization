@@ -4,6 +4,7 @@ import torch.optim as optim
 from dataloader import *
 from torch.utils.data import DataLoader
 
+# Derived class for CNN
 class Net(nn.Module):
     def __init__(self):
         super().__init__()
@@ -33,7 +34,7 @@ class Net(nn.Module):
         x = F.relu(self.conv10(x))
         return x
 
-
+# Set up dataloaders
 images = getData()
 ten = getTorchTensor(images)
 train, test = torch.split(ten, [int(.9*len(ten)), int(.1*len(ten))])
@@ -46,8 +47,10 @@ testing_data = CustomImageDataset(test)
 trainloader = DataLoader(training_data, batch_size=64, shuffle=True)
 testloader = DataLoader(testing_data, batch_size=len(testing_data), shuffle=True)
 
+# Create NN
 net = Net()
 
+# Define loss function and optimizer
 criterion = nn.MSELoss()
 optimizer = optim.SGD(net.parameters(), lr=0.01)
 
@@ -68,15 +71,14 @@ for epoch in range(20):  # loop over the dataset multiple times
 
         # print statistics
         running_loss += loss.item()
-        if i % 100 == 99:    # print every 2000 mini-batches
+        if i % 100 == 99:    # print every 100 mini-batches
             print('[%d, %5d] loss: %.3f' %
                   (epoch + 1, i + 1, running_loss / 100))
             running_loss = 0.0
 
-print('Finished Training')
-
+# Test Model with MSE
 dataiter = iter(testloader)
 images, labels = dataiter.next()
 net.eval()
 outputs = net(images)
-print(criterion(outputs, labels))
+print(f'MSE: {criterion(outputs, labels).item()}')
