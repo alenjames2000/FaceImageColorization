@@ -1,14 +1,9 @@
-from numpy.core.fromnumeric import size
 import cv2
-import os
 import glob
 import torch
 import torchvision.transforms as transforms
 import numpy
 from scaleRGB import *
-import os
-import pandas as pd
-from torchvision.io import read_image
 from torch.utils.data import Dataset
 
 
@@ -72,3 +67,42 @@ class CustomImageDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.img[idx], self.img_labels[idx]
+
+# Get Tensor to split into labels and inputs
+def getTrainTestSimple(imageTensor):
+    xtensor = torch.mul(imageTensor[:,:1,:,:], .01)
+    ytensor = imageTensor[:,1:3,:,:]
+    for i in range(7500):
+        ytensor[i, 0] = torch.mean(ytensor[i, 0])
+        ytensor[i, 1] = torch.mean(ytensor[i, 1])
+    ytensor.resize_((7500,2))    
+    return xtensor, ytensor
+
+# Derived class for Getting Image dataset
+class CustomImageDatasetSimple(Dataset):
+    def __init__(self):
+        images = getData()
+        ten = getTorchTensor(images)
+        img = dataAugment(ten)
+        img = convertSpace(img)
+        x,y = getTrainTestSimple(img)
+        self.img = x
+        self.img_labels = y
+
+    def __len__(self):
+        return len(self.img_labels)
+
+    def __getitem__(self, idx):
+        
+        return self.img[idx], self.img_labels[idx]
+
+""" WRITES INFO TO FILE
+INPUTS:
+    name: name of file
+    lines: info to write
+RETURNS:
+    NA
+"""
+def file_write(name, lines):
+    with open(name,'w') as f:
+        f.writelines(lines)
